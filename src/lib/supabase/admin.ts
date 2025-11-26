@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/types/database";
 
@@ -15,7 +15,7 @@ function getAdminCredentials() {
   return { supabaseUrl, serviceRoleKey };
 }
 
-export function createSupabaseAdminClient() {
+export function createSupabaseAdminClient(): SupabaseClient<Database> {
   if (typeof window !== "undefined") {
     throw new Error("The Supabase admin client must only be instantiated on the server.");
   }

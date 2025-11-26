@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "knowledge:seed": "tsx scripts/knowledge/process-knowledge.ts"
+    "knowledge:seed": "tsx --tsconfig tsconfig.scripts.json scripts/knowledge/process-knowledge.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.1",
