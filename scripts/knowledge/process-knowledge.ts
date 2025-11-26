@@ -5,6 +5,7 @@ import { config as loadEnv } from "dotenv";
 import OpenAI from "openai";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import type { Database } from "@/types/database";
 import { chunkText } from "./chunk";
 
 const envLocalPath = path.resolve(process.cwd(), ".env.local");
@@ -77,7 +78,7 @@ async function processFile(filePath: string) {
       embeddings.push(embedding);
     }
 
-    const rows = slice.map((chunk, idx) => ({
+    const rows: Database["public"]["Tables"]["knowledge"]["Insert"][] = slice.map((chunk, idx) => ({
       content: chunk.content,
       embedding: embeddings[idx],
       metadata: {
