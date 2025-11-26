@@ -1,12 +1,15 @@
-import "dotenv/config";
-
 import fs from "node:fs/promises";
 import path from "node:path";
 
+import { config as loadEnv } from "dotenv";
 import OpenAI from "openai";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { chunkText } from "./chunk";
+
+const envLocalPath = path.resolve(process.cwd(), ".env.local");
+loadEnv({ path: envLocalPath, override: true });
+loadEnv();
 
 const KNOWLEDGE_DIR = path.resolve(process.cwd(), "md");
 const CHUNK_SIZE = 1000;
