@@ -393,15 +393,3 @@ export const RESPONSE_FORMAT_PERFECT = `
 - ただの鏡と質問の繰り返しは避ける
 - アドバイス、決めつけ、救済者は禁止
 `;
-
-export type TapeResponse = {
-  emotionMirror: string;
-  deeperQuestion: string;
-  awarenessPrompt: string;
-  nextQuestion: string;
-  affirmation: string;
-};
-
-export const SYSTEM_INSTRUCTION = TAPE_SYSTEM_PROMPT_PERFECT + "\n\n" + RESPONSE_FORMAT_PERFECT;
-export const TAPE_SYSTEM_PROMPT = TAPE_SYSTEM_PROMPT_PERFECT;
-export const RESPONSE_FORMAT_INSTRUCTION = RESPONSE_FORMAT_PERFECT;
