@@ -263,6 +263,9 @@ export default function ChatClient() {
 
     return (
       <div className="space-y-4">
+        {messagesLoading && (
+          <p className="text-xs text-muted-foreground">履歴を更新しています...</p>
+        )}
         {displayedMessages.map((message) => (
           <div
             key={message.id}
