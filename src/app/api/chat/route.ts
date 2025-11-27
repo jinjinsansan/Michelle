@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { retrieveKnowledgeMatches, type KnowledgeMatch } from "@/lib/ai/rag";
-import { TAPE_SYSTEM_PROMPT } from "@/lib/ai/prompt";
+import { TAPE_SYSTEM_PROMPT, RESPONSE_FORMAT_INSTRUCTION, parseTapeResponse, type TapeResponse } from "@/lib/ai/prompt";
 import { getSupabaseUserContext } from "@/lib/supabase/context";
 import { getOpenAIClient } from "@/lib/ai/openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
@@ -117,7 +117,10 @@ export async function POST(request: Request) {
       source: resolveKnowledgeSource(match.metadata),
     }));
 
-    const systemMessages: ChatCompletionMessageParam[] = [{ role: "system", content: TAPE_SYSTEM_PROMPT }];
+    const systemMessages: ChatCompletionMessageParam[] = [
+      { role: "system", content: TAPE_SYSTEM_PROMPT },
+      { role: "system", content: RESPONSE_FORMAT_INSTRUCTION },
+    ];
     if (stateInstruction) {
       systemMessages.push({ role: "system", content: stateInstruction });
     }
@@ -137,7 +140,7 @@ export async function POST(request: Request) {
           const completion = await openai.chat.completions.create({
             model: chatModel,
             temperature: 0.4,
-            max_tokens: 800,
+            max_tokens: 1200,
             stream: true,
             messages: finalMessages,
           });
@@ -162,6 +165,8 @@ export async function POST(request: Request) {
             return;
           }
 
+          const parsedResponse = parseTapeResponse(trimmedReply);
+
           const assistantMessagePayload: MessageInsert = {
             session_id: activeSessionId,
             role: "assistant",
@@ -177,7 +182,12 @@ export async function POST(request: Request) {
 
           controller.enqueue(
             encoder.encode(
-              `data:${JSON.stringify({ type: "meta", sessionId: activeSessionId, knowledge: knowledgeSummary })}\n\n`,
+              `data:${JSON.stringify({ 
+                type: "meta", 
+                sessionId: activeSessionId, 
+                knowledge: knowledgeSummary,
+                structured: parsedResponse 
+              })}\n\n`,
             ),
           );
           controller.enqueue(encoder.encode(`data:${JSON.stringify({ type: "done" })}\n\n`));
