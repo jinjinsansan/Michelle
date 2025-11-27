@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import type { MessageParam, TextBlock } from "@anthropic-ai/sdk/resources/messages";
 import { z } from "zod";
 
-import { getAnthropicClient } from "@/lib/ai/anthropic";
 import { retrieveKnowledgeMatches, type KnowledgeMatch } from "@/lib/ai/rag";
 import { TAPE_SYSTEM_PROMPT } from "@/lib/ai/prompt";
 import { getSupabaseUserContext } from "@/lib/supabase/context";
+import { getOpenAIClient } from "@/lib/ai/openai";
 import type { Database } from "@/types/database";
 
 const requestSchema = z.object({
@@ -103,26 +102,22 @@ export async function POST(request: Request) {
       : [];
     const knowledgeContext = formatKnowledgeMatches(knowledgeMatches);
 
-    const anthropic = getAnthropicClient();
-    const baseConversation: MessageParam[] = summarizedHistory.map((entry) => ({
+    const baseConversation: ChatMessage[] = summarizedHistory.map((entry) => ({
       role: entry.role === "assistant" ? "assistant" : "user",
-      content: [{ type: "text", text: entry.content }],
+      content: entry.content,
     }));
     const conversation = applyKnowledgeContext(baseConversation, knowledgeContext);
 
-    const completion = await anthropic.messages.create({
-      model: "claude-3-haiku-20240307",
-      max_tokens: 600,
+    const openai = getOpenAIClient();
+    const chatModel = process.env.OPENAI_CHAT_MODEL ?? "gpt-4o-mini";
+    const completion = await openai.chat.completions.create({
+      model: chatModel,
       temperature: 0.4,
-      system: TAPE_SYSTEM_PROMPT,
-      messages: conversation,
+      max_tokens: 800,
+      messages: [{ role: "system", content: TAPE_SYSTEM_PROMPT }, ...conversation],
     });
 
-    const assistantReply = completion.content
-      .filter((block): block is TextBlock => block.type === "text")
-      .map((block) => block.text)
-      .join("\n")
-      .trim();
+    const assistantReply = completion.choices[0]?.message?.content?.trim() ?? "";
 
     if (!assistantReply) {
       return NextResponse.json({ error: "No response generated" }, { status: 502 });
@@ -169,15 +164,14 @@ function formatKnowledgeMatches(matches: KnowledgeMatch[]) {
     .join("\n\n");
 }
 
-function applyKnowledgeContext(messages: MessageParam[], knowledgeContext: string) {
+type ChatMessage = { role: "user" | "assistant"; content: string };
+
+function applyKnowledgeContext(messages: ChatMessage[], knowledgeContext: string) {
   if (!knowledgeContext) {
     return messages;
   }
 
-  const cloned = messages.map((message) => ({
-    ...message,
-    content: Array.isArray(message.content) ? [...message.content] : message.content,
-  }));
+  const cloned = messages.map((message) => ({ ...message }));
 
   for (let i = cloned.length - 1; i >= 0; i -= 1) {
     const message = cloned[i];
@@ -185,17 +179,13 @@ function applyKnowledgeContext(messages: MessageParam[], knowledgeContext: strin
       continue;
     }
 
-    const textBlocks = Array.isArray(message.content)
-      ? message.content.filter((block): block is TextBlock => block.type === "text")
-      : [];
-    const fallbackText = typeof message.content === "string" ? message.content : "";
-    const text = (textBlocks.length ? textBlocks.map((block) => block.text).join("\n") : fallbackText).trim();
+    const text = message.content.trim();
 
     const augmented = `以下はTapeAI内部の参考情報です。必要に応じて活用しながらも、ユーザーの語りを最優先してください。\n${knowledgeContext}\n\n---\nユーザーの相談:\n${text}`;
 
     cloned[i] = {
       role: "user",
-      content: [{ type: "text", text: augmented }],
+      content: augmented,
     };
 
     break;
