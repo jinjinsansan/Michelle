@@ -55,7 +55,6 @@ export default function ChatClient() {
   const [status, setStatus] = useState<string | null>(null);
   const [needsAuth, setNeedsAuth] = useState(false);
   const [knowledgeRefs, setKnowledgeRefs] = useState<KnowledgeReference[]>([]);
-  const [syncLocked, setSyncLocked] = useState(false);
 
   const activeSession = useMemo(
     () => sessions.find((session) => session.id === activeSessionId) ?? null,
@@ -126,18 +125,17 @@ export default function ChatClient() {
   }, [loadSessions]);
 
   useEffect(() => {
-    if (!activeSessionId || syncLocked) {
+    if (!activeSessionId) {
       return;
     }
     loadMessages(activeSessionId);
-  }, [activeSessionId, loadMessages, syncLocked]);
+  }, [activeSessionId, loadMessages]);
 
   const handleNewConversation = () => {
     setActiveSessionId(null);
     setMessages([]);
     setKnowledgeRefs([]);
     setStatus(null);
-    setSyncLocked(false);
   };
 
   const appendMessage = (message: MessageItem) => {
@@ -162,7 +160,6 @@ export default function ChatClient() {
     setSending(true);
     setStatus(null);
     setKnowledgeRefs([]);
-    setSyncLocked(true);
 
     appendMessage({ id: userTempId, role: "user", content: text, created_at: timestamp, pending: true });
     appendMessage({ id: assistantTempId, role: "assistant", content: "", created_at: timestamp, pending: true });
@@ -241,12 +238,10 @@ export default function ChatClient() {
       setMessages((prev) => prev.filter((msg) => msg.id !== userTempId && msg.id !== assistantTempId));
     } finally {
       setSending(false);
-      setSyncLocked(false);
     }
   };
 
   const handleSessionSelect = (sessionId: string) => {
-    setSyncLocked(false);
     setActiveSessionId(sessionId);
     setKnowledgeRefs([]);
   };
