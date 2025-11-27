@@ -196,7 +196,21 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      match_knowledge: {
+        Args: {
+          query_embedding: number[];
+          match_count?: number;
+          similarity_threshold?: number;
+        };
+        Returns: {
+          id: string;
+          content: string;
+          metadata: Json | null;
+          similarity: number;
+        }[];
+      };
+    };
     Enums: {
       session_category: 'love' | 'life' | 'relationship';
       message_role: 'user' | 'assistant' | 'system';

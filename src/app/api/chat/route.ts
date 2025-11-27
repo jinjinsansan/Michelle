@@ -3,6 +3,7 @@ import type { MessageParam, TextBlock } from "@anthropic-ai/sdk/resources/messag
 import { z } from "zod";
 
 import { getAnthropicClient } from "@/lib/ai/anthropic";
+import { retrieveKnowledgeMatches, type KnowledgeMatch } from "@/lib/ai/rag";
 import { TAPE_SYSTEM_PROMPT } from "@/lib/ai/prompt";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
@@ -99,12 +100,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to load conversation" }, { status: 500 });
     }
 
-    const anthropic = getAnthropicClient();
     const summarizedHistory = (history as Pick<MessagesTable["Row"], "role" | "content">[] | null) ?? [];
-    const conversation: MessageParam[] = summarizedHistory.map((entry) => ({
+    const latestUserEntry = [...summarizedHistory].reverse().find((entry) => entry.role === "user");
+    const knowledgeMatches = latestUserEntry
+      ? await retrieveKnowledgeMatches(supabase, latestUserEntry.content)
+      : [];
+    const knowledgeContext = formatKnowledgeMatches(knowledgeMatches);
+
+    const anthropic = getAnthropicClient();
+    const baseConversation: MessageParam[] = summarizedHistory.map((entry) => ({
       role: entry.role === "assistant" ? "assistant" : "user",
       content: [{ type: "text", text: entry.content }],
     }));
+    const conversation = applyKnowledgeContext(baseConversation, knowledgeContext);
 
     const completion = await anthropic.messages.create({
       model: "claude-3-sonnet-20240229",
@@ -150,4 +158,52 @@ export async function POST(request: Request) {
     console.error(error);
     return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
+}
+
+function formatKnowledgeMatches(matches: KnowledgeMatch[]) {
+  if (!matches.length) {
+    return "";
+  }
+
+  return matches
+    .map((match, idx) => {
+      const similarity = Math.round(match.similarity * 100);
+      return `### ナレッジ${idx + 1} (類似度: ${similarity}%)\n${match.content.trim()}`;
+    })
+    .join("\n\n");
+}
+
+function applyKnowledgeContext(messages: MessageParam[], knowledgeContext: string) {
+  if (!knowledgeContext) {
+    return messages;
+  }
+
+  const cloned = messages.map((message) => ({
+    ...message,
+    content: Array.isArray(message.content) ? [...message.content] : message.content,
+  }));
+
+  for (let i = cloned.length - 1; i >= 0; i -= 1) {
+    const message = cloned[i];
+    if (message.role !== "user") {
+      continue;
+    }
+
+    const textBlocks = Array.isArray(message.content)
+      ? message.content.filter((block): block is TextBlock => block.type === "text")
+      : [];
+    const fallbackText = typeof message.content === "string" ? message.content : "";
+    const text = (textBlocks.length ? textBlocks.map((block) => block.text).join("\n") : fallbackText).trim();
+
+    const augmented = `以下はTapeAI内部の参考情報です。必要に応じて活用しながらも、ユーザーの語りを最優先してください。\n${knowledgeContext}\n\n---\nユーザーの相談:\n${text}`;
+
+    cloned[i] = {
+      role: "user",
+      content: [{ type: "text", text: augmented }],
+    };
+
+    break;
+  }
+
+  return cloned;
 }

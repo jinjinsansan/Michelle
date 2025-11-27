@@ -1,0 +1,59 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import { getOpenAIClient } from "./openai";
+import type { Database, Json } from "@/types/database";
+
+const EMBEDDING_MODEL = "text-embedding-3-small";
+
+export type KnowledgeMatch = {
+  id: string;
+  content: string;
+  metadata: Json | null;
+  similarity: number;
+};
+
+export async function embedText(text: string) {
+  const normalized = text.trim();
+  if (!normalized) {
+    return [] as number[];
+  }
+
+  const openai = getOpenAIClient();
+  const response = await openai.embeddings.create({
+    model: EMBEDDING_MODEL,
+    input: normalized,
+  });
+
+  return response.data[0]?.embedding ?? [];
+}
+
+type RetrieveOptions = {
+  matchCount?: number;
+  similarityThreshold?: number;
+};
+
+export async function retrieveKnowledgeMatches(
+  supabase: SupabaseClient<Database>,
+  text: string,
+  options: RetrieveOptions = {},
+) {
+  const embedding = await embedText(text);
+  if (!embedding.length) {
+    return [] as KnowledgeMatch[];
+  }
+
+  const rpcArgs: Database["public"]["Functions"]["match_knowledge"]["Args"] = {
+    query_embedding: embedding,
+    match_count: options.matchCount ?? 5,
+    similarity_threshold: options.similarityThreshold ?? 0.75,
+  };
+
+  const { data, error } = await supabase.rpc("match_knowledge", rpcArgs as never);
+
+  if (error) {
+    console.error("match_knowledge error", error);
+    return [];
+  }
+
+  return (data ?? []) as KnowledgeMatch[];
+}
