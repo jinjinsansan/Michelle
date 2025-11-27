@@ -55,6 +55,7 @@ export default function ChatClient() {
   const [status, setStatus] = useState<string | null>(null);
   const [needsAuth, setNeedsAuth] = useState(false);
   const [knowledgeRefs, setKnowledgeRefs] = useState<KnowledgeReference[]>([]);
+  const [autoSelectSession, setAutoSelectSession] = useState(true);
 
   const activeSession = useMemo(
     () => sessions.find((session) => session.id === activeSessionId) ?? null,
@@ -81,7 +82,7 @@ export default function ChatClient() {
         }
         const data = (await response.json()) as SessionsResponse;
         setSessions(data.sessions ?? []);
-        if (!options?.skipAutoSelect && !activeSessionId && data.sessions.length) {
+        if (!options?.skipAutoSelect && autoSelectSession && !activeSessionId && data.sessions.length) {
           setActiveSessionId(data.sessions[0].id);
         }
       } catch (error) {
@@ -91,7 +92,7 @@ export default function ChatClient() {
         setSessionsLoading(false);
       }
     },
-    [activeSessionId, handleUnauthorized],
+    [activeSessionId, autoSelectSession, handleUnauthorized],
   );
 
   const loadMessages = useCallback(
@@ -136,6 +137,7 @@ export default function ChatClient() {
     setMessages([]);
     setKnowledgeRefs([]);
     setStatus(null);
+    setAutoSelectSession(false);
   };
 
   const appendMessage = (message: MessageItem) => {
@@ -230,6 +232,7 @@ export default function ChatClient() {
       updateMessage(assistantTempId, (msg) => ({ ...msg, pending: false }));
 
       if (resolvedSessionId) {
+        setAutoSelectSession(true);
         void loadSessions({ skipAutoSelect: true });
       }
     } catch (error) {
@@ -244,6 +247,7 @@ export default function ChatClient() {
   const handleSessionSelect = (sessionId: string) => {
     setActiveSessionId(sessionId);
     setKnowledgeRefs([]);
+    setAutoSelectSession(true);
   };
 
   const renderSessions = () => {
