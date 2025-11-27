@@ -5,6 +5,7 @@ import { retrieveKnowledgeMatches, type KnowledgeMatch } from "@/lib/ai/rag";
 import { TAPE_SYSTEM_PROMPT } from "@/lib/ai/prompt";
 import { getSupabaseUserContext } from "@/lib/supabase/context";
 import { getOpenAIClient } from "@/lib/ai/openai";
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import type { Database } from "@/types/database";
 
 const requestSchema = z.object({
@@ -102,7 +103,7 @@ export async function POST(request: Request) {
       : [];
     const knowledgeContext = formatKnowledgeMatches(knowledgeMatches);
 
-    const baseConversation: ChatMessage[] = summarizedHistory.map((entry) => ({
+    const baseConversation: ChatCompletionMessageParam[] = summarizedHistory.map((entry) => ({
       role: entry.role === "assistant" ? "assistant" : "user",
       content: entry.content,
     }));
@@ -137,9 +138,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to save assistant reply" }, { status: 500 });
     }
 
+    const knowledgeSummary = knowledgeMatches.map((match) => ({
+      id: match.id,
+      similarity: Number(match.similarity.toFixed(2)),
+      preview: summarizeContent(match.content),
+    }));
+
     return NextResponse.json({
       sessionId: activeSessionId,
       reply: assistantReply,
+      knowledge: knowledgeSummary,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -164,32 +172,36 @@ function formatKnowledgeMatches(matches: KnowledgeMatch[]) {
     .join("\n\n");
 }
 
-type ChatMessage = { role: "user" | "assistant"; content: string };
-
-function applyKnowledgeContext(messages: ChatMessage[], knowledgeContext: string) {
+function applyKnowledgeContext(
+  messages: ChatCompletionMessageParam[],
+  knowledgeContext: string,
+): ChatCompletionMessageParam[] {
   if (!knowledgeContext) {
     return messages;
   }
 
-  const cloned = messages.map((message) => ({ ...message }));
+  const cloned = [...messages];
 
   for (let i = cloned.length - 1; i >= 0; i -= 1) {
     const message = cloned[i];
-    if (message.role !== "user") {
+    if (message.role !== "user" || typeof message.content !== "string") {
       continue;
     }
 
-    const text = message.content.trim();
-
-    const augmented = `以下はTapeAI内部の参考情報です。必要に応じて活用しながらも、ユーザーの語りを最優先してください。\n${knowledgeContext}\n\n---\nユーザーの相談:\n${text}`;
-
-    cloned[i] = {
-      role: "user",
-      content: augmented,
-    };
-
+    cloned.splice(i, 0, {
+      role: "system",
+      content: `以下はTapeAI内部の参考情報です。必要に応じて活用しながらも、クライアントの語りを最優先してください。\n${knowledgeContext}`,
+    });
     break;
   }
 
   return cloned;
+}
+
+function summarizeContent(content: string, maxLength = 140) {
+  const trimmed = content.replace(/\s+/g, " ").trim();
+  if (trimmed.length <= maxLength) {
+    return trimmed;
+  }
+  return `${trimmed.slice(0, maxLength)}...`;
 }
