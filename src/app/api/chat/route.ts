@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getAnthropicClient } from "@/lib/ai/anthropic";
 import { retrieveKnowledgeMatches, type KnowledgeMatch } from "@/lib/ai/rag";
 import { TAPE_SYSTEM_PROMPT } from "@/lib/ai/prompt";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseUserContext } from "@/lib/supabase/context";
 import type { Database } from "@/types/database";
 
 const requestSchema = z.object({
@@ -27,13 +27,9 @@ export async function POST(request: Request) {
     const payload = await request.json();
     const { sessionId, message, category } = requestSchema.parse(payload);
 
-    const supabase = createSupabaseServerClient();
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+    const { client: supabase, userId } = await getSupabaseUserContext();
 
-    if (userError || !user) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -44,7 +40,7 @@ export async function POST(request: Request) {
         .from("sessions")
         .select("id")
         .eq("id", activeSessionId)
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .maybeSingle();
 
       if (sessionLookupError || !existingSession) {
@@ -54,7 +50,7 @@ export async function POST(request: Request) {
       const derivedCategory = (category ?? DEFAULT_CATEGORY) as SessionInsert["category"];
       const title = message.trim().slice(0, 60) || "新しい相談";
       const newSessionPayload: SessionInsert = {
-        user_id: user.id,
+        user_id: userId,
         category: derivedCategory,
         title,
       };

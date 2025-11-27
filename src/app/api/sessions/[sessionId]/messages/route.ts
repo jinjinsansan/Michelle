@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseUserContext } from "@/lib/supabase/context";
 
 const paramsSchema = z.object({
   sessionId: z.string().uuid(),
@@ -10,13 +10,9 @@ const paramsSchema = z.object({
 export async function GET(_: Request, context: { params: { sessionId: string } }) {
   const { sessionId } = paramsSchema.parse(context.params);
 
-  const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  const { client: supabase, userId } = await getSupabaseUserContext();
 
-  if (userError || !user) {
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -24,7 +20,7 @@ export async function GET(_: Request, context: { params: { sessionId: string } }
     .from("sessions")
     .select("id, title, category")
     .eq("id", sessionId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (sessionError || !session) {
