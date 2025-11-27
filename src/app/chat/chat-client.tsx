@@ -17,6 +17,7 @@ type MessageItem = {
   role: "user" | "assistant" | "system";
   content: string;
   created_at: string;
+  pending?: boolean;
 };
 
 type SessionsResponse = {
@@ -28,9 +29,11 @@ type MessagesResponse = {
   messages: MessageItem[];
 };
 
-type ChatResponse = {
-  sessionId: string;
-  reply: string;
+type StreamPayload = {
+  type: "delta" | "meta" | "done" | "error";
+  content?: string;
+  message?: string;
+  sessionId?: string;
   knowledge?: KnowledgeReference[];
 };
 
@@ -44,7 +47,6 @@ export default function ChatClient() {
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [messages, setMessages] = useState<MessageItem[]>([]);
-  const [optimisticMessages, setOptimisticMessages] = useState<MessageItem[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [input, setInput] = useState("");
@@ -52,6 +54,7 @@ export default function ChatClient() {
   const [status, setStatus] = useState<string | null>(null);
   const [needsAuth, setNeedsAuth] = useState(false);
   const [knowledgeRefs, setKnowledgeRefs] = useState<KnowledgeReference[]>([]);
+  const [syncLocked, setSyncLocked] = useState(false);
 
   const activeSession = useMemo(
     () => sessions.find((session) => session.id === activeSessionId) ?? null,
@@ -63,30 +66,33 @@ export default function ChatClient() {
     setStatus("この機能を利用するにはログインが必要です");
   }, []);
 
-  const loadSessions = useCallback(async (options?: { skipAutoSelect?: boolean }) => {
-    setSessionsLoading(true);
-    try {
-      const response = await fetch("/api/sessions", { credentials: "include" });
-      if (response.status === 401) {
-        handleUnauthorized();
-        setSessions([]);
-        return;
+  const loadSessions = useCallback(
+    async (options?: { skipAutoSelect?: boolean }) => {
+      setSessionsLoading(true);
+      try {
+        const response = await fetch("/api/sessions", { credentials: "include" });
+        if (response.status === 401) {
+          handleUnauthorized();
+          setSessions([]);
+          return;
+        }
+        if (!response.ok) {
+          throw new Error("セッション一覧の取得に失敗しました");
+        }
+        const data = (await response.json()) as SessionsResponse;
+        setSessions(data.sessions ?? []);
+        if (!options?.skipAutoSelect && !activeSessionId && data.sessions.length) {
+          setActiveSessionId(data.sessions[0].id);
+        }
+      } catch (error) {
+        console.error(error);
+        setStatus((error as Error).message);
+      } finally {
+        setSessionsLoading(false);
       }
-      if (!response.ok) {
-        throw new Error("セッション一覧の取得に失敗しました");
-      }
-      const data = (await response.json()) as SessionsResponse;
-      setSessions(data.sessions ?? []);
-      if (!options?.skipAutoSelect && !activeSessionId && data.sessions.length) {
-        setActiveSessionId(data.sessions[0].id);
-      }
-    } catch (error) {
-      console.error(error);
-      setStatus((error as Error).message);
-    } finally {
-      setSessionsLoading(false);
-    }
-  }, [activeSessionId, handleUnauthorized]);
+    },
+    [activeSessionId, handleUnauthorized],
+  );
 
   const loadMessages = useCallback(
     async (sessionId: string) => {
@@ -104,7 +110,6 @@ export default function ChatClient() {
         }
         const data = (await response.json()) as MessagesResponse;
         setMessages(data.messages ?? []);
-        setOptimisticMessages([]);
       } catch (error) {
         console.error(error);
         setStatus((error as Error).message);
@@ -120,18 +125,26 @@ export default function ChatClient() {
   }, [loadSessions]);
 
   useEffect(() => {
-    if (!activeSessionId) {
-      setMessages([]);
-      setOptimisticMessages([]);
+    if (!activeSessionId || syncLocked) {
       return;
     }
     loadMessages(activeSessionId);
-  }, [activeSessionId, loadMessages]);
+  }, [activeSessionId, loadMessages, syncLocked]);
 
   const handleNewConversation = () => {
     setActiveSessionId(null);
     setMessages([]);
+    setKnowledgeRefs([]);
     setStatus(null);
+    setSyncLocked(false);
+  };
+
+  const appendMessage = (message: MessageItem) => {
+    setMessages((prev) => [...prev, message]);
+  };
+
+  const updateMessage = (id: string, updater: (prev: MessageItem) => MessageItem) => {
+    setMessages((prev) => prev.map((message) => (message.id === id ? updater(message) : message)));
   };
 
   const handleSend = async () => {
@@ -139,67 +152,104 @@ export default function ChatClient() {
       return;
     }
 
-    const message = input.trim();
+    const text = input.trim();
+    const timestamp = new Date().toISOString();
+    const userTempId = `local-user-${Date.now()}`;
+    const assistantTempId = `${userTempId}-assistant`;
+
     setInput("");
     setSending(true);
     setStatus(null);
     setKnowledgeRefs([]);
+    setSyncLocked(true);
 
-    const tempId = `temp-${Date.now()}`;
-    const now = new Date().toISOString();
-    const optimisticUser: MessageItem = {
-      id: tempId,
-      role: "user",
-      content: message,
-      created_at: now,
-    };
-    const optimisticAssistant: MessageItem = {
-      id: `${tempId}-assistant`,
-      role: "assistant",
-      content: "TapeAI が応答を準備しています...",
-      created_at: now,
-    };
-    setOptimisticMessages([optimisticUser, optimisticAssistant]);
+    appendMessage({ id: userTempId, role: "user", content: text, created_at: timestamp, pending: true });
+    appendMessage({ id: assistantTempId, role: "assistant", content: "", created_at: timestamp, pending: true });
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: activeSessionId ?? undefined,
-          message,
-        }),
+        body: JSON.stringify({ sessionId: activeSessionId ?? undefined, message: text }),
       });
 
       if (response.status === 401) {
         handleUnauthorized();
+        setMessages((prev) => prev.filter((msg) => msg.id !== userTempId && msg.id !== assistantTempId));
         return;
       }
 
-      if (!response.ok) {
-        throw new Error("メッセージの送信に失敗しました");
+      if (!response.ok || !response.body) {
+        const errorPayload = await response.json().catch(() => ({ error: "メッセージの送信に失敗しました" }));
+        throw new Error(errorPayload.error ?? "メッセージの送信に失敗しました");
       }
 
-      const data = (await response.json()) as ChatResponse;
-      setOptimisticMessages([]);
-      setActiveSessionId(data.sessionId);
-      if (data.knowledge) {
-        setKnowledgeRefs(data.knowledge);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let streamingText = "";
+      let resolvedSessionId = activeSessionId;
+
+      const flushBuffer = () => {
+        let boundary = buffer.indexOf("\n\n");
+        while (boundary !== -1) {
+          const chunk = buffer.slice(0, boundary).trim();
+          buffer = buffer.slice(boundary + 2);
+          if (chunk.startsWith("data:")) {
+            const payload = JSON.parse(chunk.slice(5).trim()) as StreamPayload;
+            if (payload.type === "delta" && payload.content) {
+              streamingText += payload.content;
+              updateMessage(assistantTempId, (msg) => ({ ...msg, content: streamingText }));
+            }
+            if (payload.type === "meta") {
+              if (payload.sessionId) {
+                resolvedSessionId = payload.sessionId;
+                setActiveSessionId(payload.sessionId);
+              }
+              if (payload.knowledge) {
+                setKnowledgeRefs(payload.knowledge);
+              }
+            }
+            if (payload.type === "error") {
+              throw new Error(payload.message || "メッセージの送信に失敗しました");
+            }
+          }
+          boundary = buffer.indexOf("\n\n");
+        }
+      };
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        flushBuffer();
       }
-      await loadSessions({ skipAutoSelect: true });
-      await loadMessages(data.sessionId);
+
+      flushBuffer();
+
+      updateMessage(userTempId, (msg) => ({ ...msg, pending: false }));
+      updateMessage(assistantTempId, (msg) => ({ ...msg, pending: false }));
+
+      if (resolvedSessionId) {
+        await loadSessions({ skipAutoSelect: true });
+        await loadMessages(resolvedSessionId);
+      }
     } catch (error) {
       console.error(error);
       setStatus((error as Error).message);
-      setOptimisticMessages([]);
+      setMessages((prev) => prev.filter((msg) => msg.id !== userTempId && msg.id !== assistantTempId));
     } finally {
       setSending(false);
+      setSyncLocked(false);
     }
   };
 
   const handleSessionSelect = (sessionId: string) => {
+    setSyncLocked(false);
     setActiveSessionId(sessionId);
+    setMessages([]);
+    setKnowledgeRefs([]);
   };
 
   const renderSessions = () => {
@@ -223,9 +273,7 @@ export default function ChatClient() {
               type="button"
               className={cn(
                 "w-full rounded-md border px-3 py-2 text-left transition",
-                activeSessionId === session.id
-                  ? "border-primary bg-primary/10"
-                  : "border-border hover:bg-muted",
+                activeSessionId === session.id ? "border-primary bg-primary/10" : "border-border hover:bg-muted",
               )}
               onClick={() => handleSessionSelect(session.id)}
             >
@@ -238,14 +286,12 @@ export default function ChatClient() {
     );
   };
 
-  const displayedMessages = useMemo(() => [...messages, ...optimisticMessages], [messages, optimisticMessages]);
-
   const renderMessages = () => {
     if (needsAuth) {
       return <p className="text-sm text-muted-foreground">ログイン後にチャットを開始できます。</p>;
     }
 
-    if (!activeSessionId && !displayedMessages.length) {
+    if (!activeSessionId && !messages.length) {
       return (
         <div className="text-center text-muted-foreground">
           <p>新しい相談を開始してみましょう。</p>
@@ -253,45 +299,32 @@ export default function ChatClient() {
       );
     }
 
-    if (messagesLoading) {
-      return <p className="text-sm text-muted-foreground">メッセージを読み込んでいます...</p>;
-    }
-
-    if (!displayedMessages.length) {
+    if (!messages.length) {
       return <p className="text-sm text-muted-foreground">まだメッセージはありません。</p>;
     }
 
     return (
       <div className="space-y-4">
-        {messagesLoading && (
-          <p className="text-xs text-muted-foreground">履歴を更新しています...</p>
-        )}
-        {displayedMessages.map((message) => (
+        {messagesLoading && <p className="text-xs text-muted-foreground">会話を同期しています...</p>}
+        {messages.map((message) => (
           <div
             key={message.id}
-            className={cn(
-              "flex",
-              message.role === "user" ? "justify-end" : "justify-start",
-            )}
+            className={cn("flex", message.role === "user" ? "justify-end" : "justify-start")}
           >
             <div
               className={cn(
                 "max-w-full rounded-lg px-4 py-2 text-sm shadow-sm",
-                message.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-foreground",
+                message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground",
               )}
             >
-              <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+              <p className="whitespace-pre-wrap leading-relaxed">{message.content || " "}</p>
               <p
                 className={cn(
                   "mt-1 text-right text-[11px]",
-                  message.role === "user"
-                    ? "text-primary-foreground/70"
-                    : "text-muted-foreground",
+                  message.role === "user" ? "text-primary-foreground/70" : "text-muted-foreground",
                 )}
               >
-                {formatRelativeTime(message.created_at)}
+                {message.pending ? "送信中..." : formatRelativeTime(message.created_at)}
               </p>
             </div>
           </div>
@@ -318,9 +351,7 @@ export default function ChatClient() {
       <section className="flex flex-col rounded-xl border bg-card p-4 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <p className="text-lg font-semibold">
-              {activeSession?.title || "TapeAI カウンセリング"}
-            </p>
+            <p className="text-lg font-semibold">{activeSession?.title || "カウンセリング"}</p>
             <p className="text-xs text-muted-foreground">
               {needsAuth ? "ログインが必要です" : "あなたのペースでご相談ください"}
             </p>
@@ -329,19 +360,19 @@ export default function ChatClient() {
 
         <div className="flex-1 space-y-4 overflow-y-auto rounded-lg border bg-background p-4">
           {renderMessages()}
-        {knowledgeRefs.length > 0 && (
-          <div className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
-            <p className="mb-2 font-semibold text-foreground">TapeAI内部ナレッジ参照</p>
-            <ul className="space-y-2">
-              {knowledgeRefs.map((ref) => (
-                <li key={ref.id}>
-                  <span className="font-semibold text-foreground">{Math.round(ref.similarity * 100)}%</span>
-                  <span className="ml-2 block text-muted-foreground">{ref.preview}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          {knowledgeRefs.length > 0 && (
+            <div className="rounded-lg border bg-muted/40 p-3 text-xs text-muted-foreground">
+              <p className="mb-2 font-semibold text-foreground">参考情報</p>
+              <ul className="space-y-2">
+                {knowledgeRefs.map((ref) => (
+                  <li key={ref.id}>
+                    <span className="font-semibold text-foreground">{Math.round(ref.similarity * 100)}%</span>
+                    <span className="ml-2 block text-muted-foreground">{ref.preview}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <form

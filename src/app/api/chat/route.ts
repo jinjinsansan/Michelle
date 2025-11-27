@@ -108,46 +108,89 @@ export async function POST(request: Request) {
       content: entry.content,
     }));
     const conversation = applyKnowledgeContext(baseConversation, knowledgeContext);
-
-    const openai = getOpenAIClient();
-    const chatModel = process.env.OPENAI_CHAT_MODEL ?? "gpt-4o-mini";
-    const completion = await openai.chat.completions.create({
-      model: chatModel,
-      temperature: 0.4,
-      max_tokens: 800,
-      messages: [{ role: "system", content: TAPE_SYSTEM_PROMPT }, ...conversation],
-    });
-
-    const assistantReply = completion.choices[0]?.message?.content?.trim() ?? "";
-
-    if (!assistantReply) {
-      return NextResponse.json({ error: "No response generated" }, { status: 502 });
-    }
-
-    const assistantMessagePayload: MessageInsert = {
-      session_id: activeSessionId,
-      role: "assistant",
-      content: assistantReply,
-    };
-    const assistantMessageInsert = await supabase
-      .from("messages")
-      .insert(assistantMessagePayload as never);
-
-    if (assistantMessageInsert.error) {
-      console.error(assistantMessageInsert.error);
-      return NextResponse.json({ error: "Failed to save assistant reply" }, { status: 500 });
-    }
-
     const knowledgeSummary = knowledgeMatches.map((match) => ({
       id: match.id,
       similarity: Number(match.similarity.toFixed(2)),
       preview: summarizeContent(match.content),
     }));
 
-    return NextResponse.json({
-      sessionId: activeSessionId,
-      reply: assistantReply,
-      knowledge: knowledgeSummary,
+    const openai = getOpenAIClient();
+    const chatModel = process.env.OPENAI_CHAT_MODEL ?? "gpt-4o-mini";
+
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          controller.enqueue(
+            encoder.encode(`data:${JSON.stringify({ type: "meta", sessionId: activeSessionId })}\n\n`),
+          );
+
+          const completion = await openai.chat.completions.create({
+            model: chatModel,
+            temperature: 0.4,
+            max_tokens: 800,
+            stream: true,
+            messages: [{ role: "system", content: TAPE_SYSTEM_PROMPT }, ...conversation],
+          });
+
+          let fullReply = "";
+          for await (const chunk of completion) {
+            const delta = chunk.choices[0]?.delta?.content ?? "";
+            if (delta) {
+              fullReply += delta;
+              controller.enqueue(
+                encoder.encode(`data:${JSON.stringify({ type: "delta", content: delta })}\n\n`),
+              );
+            }
+          }
+
+          const trimmedReply = fullReply.trim();
+          if (!trimmedReply) {
+            controller.enqueue(
+              encoder.encode(`data:${JSON.stringify({ type: "error", message: "応答を生成できませんでした。" })}\n\n`),
+            );
+            controller.close();
+            return;
+          }
+
+          const assistantMessagePayload: MessageInsert = {
+            session_id: activeSessionId,
+            role: "assistant",
+            content: trimmedReply,
+          };
+          const insertResult = await supabase
+            .from("messages")
+            .insert(assistantMessagePayload as never);
+
+          if (insertResult.error) {
+            console.error(insertResult.error);
+          }
+
+          controller.enqueue(
+            encoder.encode(
+              `data:${JSON.stringify({ type: "meta", sessionId: activeSessionId, knowledge: knowledgeSummary })}\n\n`,
+            ),
+          );
+          controller.enqueue(encoder.encode(`data:${JSON.stringify({ type: "done" })}\n\n`));
+          controller.close();
+        } catch (error) {
+          console.error(error);
+          controller.enqueue(
+            encoder.encode(
+              `data:${JSON.stringify({ type: "error", message: "応答の生成に失敗しました。" })}\n\n`,
+            ),
+          );
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+      },
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -167,7 +210,7 @@ function formatKnowledgeMatches(matches: KnowledgeMatch[]) {
   return matches
     .map((match, idx) => {
       const similarity = Math.round(match.similarity * 100);
-      return `### ナレッジ${idx + 1} (類似度: ${similarity}%)\n${match.content.trim()}`;
+      return `### 参考情報${idx + 1} (類似度: ${similarity}%)\n${match.content.trim()}`;
     })
     .join("\n\n");
 }
@@ -190,7 +233,7 @@ function applyKnowledgeContext(
 
     cloned.splice(i, 0, {
       role: "system",
-      content: `以下はTapeAI内部の参考情報です。必要に応じて活用しながらも、クライアントの語りを最優先してください。\n${knowledgeContext}`,
+      content: `以下は内部専用の参考情報です。必要に応じて内容を取り入れつつ、クライアントの語りを最優先してください。\n${knowledgeContext}`,
     });
     break;
   }
