@@ -5,6 +5,7 @@ import type { Database, Json } from "@/types/database";
 
 const EMBEDDING_MODEL = "text-embedding-3-small";
 const DEFAULT_THRESHOLD = 0.65;
+const FALLBACK_THRESHOLDS = [0.58, 0.5, 0.45, 0.35];
 
 export type KnowledgeMatch = {
   id: string;
@@ -46,7 +47,7 @@ export async function retrieveKnowledgeMatches(
   const attempt = async (threshold: number) => {
     const rpcArgs: Database["public"]["Functions"]["match_knowledge"]["Args"] = {
       query_embedding: embedding,
-      match_count: options.matchCount ?? 6,
+      match_count: options.matchCount ?? 8,
       similarity_threshold: threshold,
     };
 
@@ -58,11 +59,16 @@ export async function retrieveKnowledgeMatches(
     return (data ?? []) as KnowledgeMatch[];
   };
 
-  const primaryThreshold = options.similarityThreshold ?? DEFAULT_THRESHOLD;
-  let matches = await attempt(primaryThreshold);
+  const thresholds = [options.similarityThreshold ?? DEFAULT_THRESHOLD, ...FALLBACK_THRESHOLDS]
+    .filter((value, index, arr) => value > 0 && arr.indexOf(value) === index)
+    .sort((a, b) => b - a);
 
-  if ((!matches || matches.length === 0) && primaryThreshold > 0.45) {
-    matches = await attempt(0.45);
+  for (const threshold of thresholds) {
+    const matches = await attempt(threshold);
+    if (matches.length) {
+      return matches;
+    }
   }
-  return matches;
+
+  return [];
 }

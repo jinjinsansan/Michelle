@@ -41,6 +41,7 @@ type KnowledgeReference = {
   id: string;
   similarity: number;
   preview: string;
+  source?: string;
 };
 
 export default function ChatClient() {
@@ -232,8 +233,7 @@ export default function ChatClient() {
       updateMessage(assistantTempId, (msg) => ({ ...msg, pending: false }));
 
       if (resolvedSessionId) {
-        await loadSessions({ skipAutoSelect: true });
-        await loadMessages(resolvedSessionId);
+        void loadSessions({ skipAutoSelect: true });
       }
     } catch (error) {
       console.error(error);
@@ -248,7 +248,6 @@ export default function ChatClient() {
   const handleSessionSelect = (sessionId: string) => {
     setSyncLocked(false);
     setActiveSessionId(sessionId);
-    setMessages([]);
     setKnowledgeRefs([]);
   };
 
@@ -365,9 +364,14 @@ export default function ChatClient() {
               <p className="mb-2 font-semibold text-foreground">参考情報</p>
               <ul className="space-y-2">
                 {knowledgeRefs.map((ref) => (
-                  <li key={ref.id}>
-                    <span className="font-semibold text-foreground">{Math.round(ref.similarity * 100)}%</span>
-                    <span className="ml-2 block text-muted-foreground">{ref.preview}</span>
+                  <li key={ref.id} className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                      <span className="font-semibold text-foreground">
+                        {Math.round(ref.similarity * 100)}%
+                      </span>
+                      {ref.source && <span className="truncate text-muted-foreground">{ref.source}</span>}
+                    </div>
+                    <p className="text-muted-foreground">{ref.preview}</p>
                   </li>
                 ))}
               </ul>
