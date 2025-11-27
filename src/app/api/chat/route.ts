@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { retrieveKnowledgeMatches, type KnowledgeMatch } from "@/lib/ai/rag";
-import { TAPE_SYSTEM_PROMPT, RESPONSE_FORMAT_INSTRUCTION, parseTapeResponse, type TapeResponse } from "@/lib/ai/prompt";
+import { TAPE_SYSTEM_PROMPT, RESPONSE_FORMAT_INSTRUCTION } from "@/lib/ai/prompt";
 import { getSupabaseUserContext } from "@/lib/supabase/context";
 import { getOpenAIClient } from "@/lib/ai/openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
@@ -165,8 +165,6 @@ export async function POST(request: Request) {
             return;
           }
 
-          const parsedResponse = parseTapeResponse(trimmedReply);
-
           const assistantMessagePayload: MessageInsert = {
             session_id: activeSessionId,
             role: "assistant",
@@ -185,8 +183,7 @@ export async function POST(request: Request) {
               `data:${JSON.stringify({ 
                 type: "meta", 
                 sessionId: activeSessionId, 
-                knowledge: knowledgeSummary,
-                structured: parsedResponse 
+                knowledge: knowledgeSummary
               })}\n\n`,
             ),
           );
