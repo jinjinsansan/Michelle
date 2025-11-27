@@ -1,4 +1,5 @@
 import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/types/database";
 
@@ -15,7 +16,7 @@ function getBrowserCredentials() {
   return { supabaseUrl, supabaseAnonKey };
 }
 
-export function createSupabaseBrowserClient() {
+export function createSupabaseBrowserClient(): SupabaseClient<Database> {
   const { supabaseUrl, supabaseAnonKey } = getBrowserCredentials();
 
   return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);

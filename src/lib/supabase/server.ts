@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/types/database";
 
@@ -16,7 +17,7 @@ function getServerCredentials() {
   return { supabaseUrl, supabaseAnonKey };
 }
 
-export function createSupabaseServerClient() {
+export function createSupabaseServerClient(): SupabaseClient<Database> {
   const cookieStore = cookies();
   const { supabaseUrl, supabaseAnonKey } = getServerCredentials();
 
