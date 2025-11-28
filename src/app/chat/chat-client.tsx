@@ -60,18 +60,27 @@ const MichelleAvatar = ({ className, size = "md" }: { className?: string, size?:
   // テストしたい画像ファイル名をここに指定
   const AVATAR_SRC = "/1.png";
 
+  // サイズに応じたピクセル値を定義
+  const sizePx = {
+    sm: 32,
+    md: 40,
+    lg: 96,
+  };
+
   return (
     <div className={cn(
-      "relative flex items-center justify-center rounded-full border border-pink-200 shadow-sm overflow-hidden bg-pink-50",
+      "relative flex items-center justify-center rounded-full border border-pink-200 shadow-sm overflow-hidden bg-pink-50 shrink-0",
       sizeClasses[size],
       className
     )}>
+      {/* 確実に表示させるためにimgタグも検討するが、まずはNext/Imageの修正版 */}
       <Image
         src={AVATAR_SRC}
         alt="Michelle AI"
-        fill
-        className="object-cover"
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        width={sizePx[size]}
+        height={sizePx[size]}
+        className="object-cover h-full w-full"
+        unoptimized // 画像最適化をスキップして確実に表示
       />
     </div>
   );
