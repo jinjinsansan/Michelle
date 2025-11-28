@@ -26,7 +26,7 @@ async function updateAssistant() {
   
   const payload = {
     instructions: instructions,
-    name: "Michelle AI (v8.2 - No Jargon)", // 名前も更新してわかりやすく
+    name: "Michelle AI (v8.3 - Force File Search)", // 名前も更新してわかりやすく
   };
 
   const res = await fetch(`https://api.openai.com/v1/assistants/${ASSISTANT_ID}`, {
