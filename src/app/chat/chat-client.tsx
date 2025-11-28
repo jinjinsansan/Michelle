@@ -435,7 +435,7 @@ export default function ChatClient() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-6 p-4 md:p-6 max-w-3xl mx-auto w-full pb-32">
+            <div className="flex flex-col gap-6 p-4 md:p-6 max-w-3xl mx-auto w-full pb-48">
               {messages.map((msg, idx) => (
                 <div 
                   key={msg.id} 
@@ -494,7 +494,7 @@ export default function ChatClient() {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-background/80 backdrop-blur-lg border-t absolute bottom-0 left-0 right-0 w-full">
+        <div className="p-3 bg-background/80 backdrop-blur-lg border-t absolute bottom-0 left-0 right-0 w-full">
           <div className="max-w-3xl mx-auto relative">
             <form 
               onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }}
