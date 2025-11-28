@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const menus = [
@@ -41,6 +42,32 @@ const roadmap = [
 export default function Home() {
   return (
     <div className="min-h-dvh bg-gradient-to-b from-background to-secondary/30">
+      {/* Navigation Bar */}
+      <header className="flex items-center justify-between px-6 py-4 sm:px-12">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl font-bold font-serif italic text-primary tracking-tight">
+            Michelle
+          </span>
+        </div>
+        <nav className="hidden md:flex items-center gap-6">
+          <Link href="/about" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+            ミシェルについて
+          </Link>
+          <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+            料金プラン
+          </Link>
+          <Button variant="ghost" className="text-sm" asChild>
+            <Link href="/login">ログイン</Link>
+          </Button>
+          <Button className="rounded-full px-5 text-sm" asChild>
+            <Link href="/chat">相談を始める</Link>
+          </Button>
+        </nav>
+        <Button className="md:hidden rounded-full px-4 text-xs" asChild>
+          <Link href="/chat">相談する</Link>
+        </Button>
+      </header>
+
       <main className="mx-auto flex max-w-6xl flex-col gap-16 px-6 py-16 sm:px-8 lg:px-12">
         <section className="flex flex-col gap-6 rounded-3xl border bg-card/80 px-8 py-14 shadow-lg shadow-primary/5 sm:px-12">
           <p className="text-sm font-medium uppercase tracking-[0.4em] text-primary">
