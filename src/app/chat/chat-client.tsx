@@ -281,6 +281,10 @@ export default function ChatClient() {
     }
   };
 
+  const cleanContent = (content: string) => {
+    return content.replace(/【\d+:\d+†.*?】/g, "");
+  };
+
   // --- Render ---
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-background text-foreground">
@@ -457,7 +461,7 @@ export default function ChatClient() {
                       ? "bg-primary text-primary-foreground rounded-tr-sm" 
                       : "bg-white dark:bg-muted border border-border/50 rounded-tl-sm"
                   )}>
-                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                    <p className="whitespace-pre-wrap">{cleanContent(msg.content)}</p>
                     {msg.pending && (
                       <span className="inline-block w-1.5 h-4 ml-1 bg-current animate-pulse align-middle" />
                     )}
