@@ -5,7 +5,7 @@ import { getOpenAIClient } from "@/lib/ai/openai";
 import type { Database } from "@/types/database";
 
 // 環境変数からAssistant IDを取得
-const ASSISTANT_ID = process.env.ASSISTANT_ID || "asst_l2JEignTzzXF2a9PL6jgIsV9"; // フォールバック（今回作成したもの）
+const ASSISTANT_ID = process.env.ASSISTANT_ID || "asst_h5rrljLWogiiDUrgzz0hH17C"; // フォールバック（v8.4 - New Knowledge Added）
 
 const requestSchema = z.object({
   sessionId: z.string().uuid().optional(),
