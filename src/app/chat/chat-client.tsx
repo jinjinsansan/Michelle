@@ -73,14 +73,12 @@ const MichelleAvatar = ({ className, size = "md" }: { className?: string, size?:
       sizeClasses[size],
       className
     )}>
-      {/* 確実に表示させるためにimgタグも検討するが、まずはNext/Imageの修正版 */}
-      <Image
+      {/* Next/Imageの代わりに通常のimgタグを使用してデバッグ */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={AVATAR_SRC}
         alt="Michelle AI"
-        width={sizePx[size]}
-        height={sizePx[size]}
         className="object-cover h-full w-full"
-        unoptimized // 画像最適化をスキップして確実に表示
       />
     </div>
   );
