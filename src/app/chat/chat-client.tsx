@@ -47,6 +47,25 @@ type KnowledgeReference = {
   source?: string;
 };
 
+// --- Components ---
+const MichelleAvatar = ({ className, size = "md" }: { className?: string, size?: "sm" | "md" | "lg" }) => {
+  const sizeClasses = {
+    sm: "h-8 w-8 text-sm",
+    md: "h-10 w-10 text-base",
+    lg: "h-24 w-24 text-3xl",
+  };
+
+  return (
+    <div className={cn(
+      "flex items-center justify-center rounded-full bg-gradient-to-br from-pink-100 to-pink-200 border border-pink-200 shadow-sm text-pink-600 font-serif italic font-bold select-none",
+      sizeClasses[size],
+      className
+    )}>
+      M
+    </div>
+  );
+};
+
 export default function ChatClient() {
   // --- State ---
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
@@ -412,9 +431,7 @@ export default function ChatClient() {
         <div className="flex-1 overflow-y-auto">
           {messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center p-8 text-center space-y-6">
-              <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center shadow-sm">
-                <Bot className="h-10 w-10 text-primary" />
-              </div>
+              <MichelleAvatar size="lg" />
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">こんにちは、ミシェルです</h2>
                 <p className="text-muted-foreground max-w-md">
@@ -450,9 +467,7 @@ export default function ChatClient() {
                 >
                   {/* Avatar (AI) */}
                   {msg.role === "assistant" && (
-                    <div className="h-8 w-8 shrink-0 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                      <Bot className="h-5 w-5 text-primary" />
-                    </div>
+                    <MichelleAvatar size="sm" className="shrink-0" />
                   )}
 
                   <div className={cn(
