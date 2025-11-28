@@ -439,7 +439,7 @@ export default function ChatClient() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-6 p-4 md:p-6 max-w-3xl mx-auto w-full pb-48">
+            <div className="flex flex-col gap-6 p-4 md:p-6 max-w-3xl mx-auto w-full">
               {messages.map((msg, idx) => (
                 <div 
                   key={msg.id} 
@@ -492,13 +492,14 @@ export default function ChatClient() {
                 </div>
               )}
               
-              <div ref={messagesEndRef} className="h-1" />
+              <div className="h-32 md:h-48 shrink-0" /> {/* 入力エリア分のスペーサー */}
+              <div ref={messagesEndRef} />
             </div>
           )}
         </div>
 
         {/* Input Area */}
-        <div className="p-3 bg-background/80 backdrop-blur-lg border-t absolute bottom-0 left-0 right-0 w-full">
+        <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-background via-background to-transparent pt-10 pb-6 px-4">
           <div className="max-w-3xl mx-auto relative">
             <form 
               onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }}
