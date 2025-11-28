@@ -50,18 +50,37 @@ type KnowledgeReference = {
 // --- Components ---
 const MichelleAvatar = ({ className, size = "md" }: { className?: string, size?: "sm" | "md" | "lg" }) => {
   const sizeClasses = {
-    sm: "h-8 w-8 text-sm",
-    md: "h-10 w-10 text-base",
-    lg: "h-24 w-24 text-3xl",
+    sm: "h-8 w-8",
+    md: "h-10 w-10",
+    lg: "h-24 w-24",
   };
 
   return (
     <div className={cn(
-      "flex items-center justify-center rounded-full bg-gradient-to-br from-pink-100 to-pink-200 border border-pink-200 shadow-sm text-pink-600 font-serif italic font-bold select-none",
+      "flex items-center justify-center rounded-full bg-gradient-to-br from-pink-100 to-pink-200 border border-pink-200 shadow-sm overflow-hidden",
       sizeClasses[size],
       className
     )}>
-      M
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-full w-full text-pink-400"
+      >
+        {/* 背景の髪 */}
+        <path
+          d="M12 4C15 4 17 6 17 9C17 12 15.5 14 12 14C8.5 14 7 12 7 9C7 6 9 4 12 4Z"
+          fill="currentColor"
+          opacity="0.8"
+        />
+        {/* 首と肩（後ろ姿） */}
+        <path
+          d="M12 13C14.5 13 18 15 18 19V21H6V19C6 15 9.5 13 12 13Z"
+          fill="currentColor"
+        />
+        {/* 髪の結び目（シニヨン風） */}
+        <circle cx="12" cy="7" r="2" fill="currentColor" opacity="0.6" />
+      </svg>
     </div>
   );
 };
