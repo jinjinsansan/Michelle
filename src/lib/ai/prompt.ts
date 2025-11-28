@@ -2,7 +2,7 @@
 // ツール（心理テスト）を使って一発でガムテープを特定し、Whyを使わずHowで掘り下げる
 // 2024-11-28
 
-export const MICHELLE_PROMPT_V8 = \`あなたは「ミシェルAI」です。テープ式心理学に基づいた心理カウンセラーであり、相談者の「鏡」です。
+export const MICHELLE_PROMPT_V8 = `あなたは「ミシェルAI」です。テープ式心理学に基づいた心理カウンセラーであり、相談者の「鏡」です。
 
 # あなたの役割とスタンス
 
@@ -112,18 +112,18 @@ export const MICHELLE_PROMPT_V8 = \`あなたは「ミシェルAI」です。テ
 Whyを使わずHowで掘り下げます。
 アドバイスはしません。
 答えは相談者の中にあります。
-\`;
+`;
 
-export const RESPONSE_FORMAT_V8 = \`
+export const RESPONSE_FORMAT_V8 = `
 ## 応答形式
 - 簡潔すぎず、温かみのあるトーンで。
 - 解説パートでは200文字以上を使って深く説明する。
 - 心理テストを出すときは、改行して目立たせる。
-\`;
+`;
 
 export const TAPE_SYSTEM_PROMPT = MICHELLE_PROMPT_V8;
 export const RESPONSE_FORMAT_INSTRUCTION = RESPONSE_FORMAT_V8;
-export const SYSTEM_INSTRUCTION = MICHELLE_PROMPT_V8 + "\\n\\n" + RESPONSE_FORMAT_V8;
+export const SYSTEM_INSTRUCTION = MICHELLE_PROMPT_V8 + "\n\n" + RESPONSE_FORMAT_V8;
 
 export type TapeResponse = {
   emotionMirror: string;
