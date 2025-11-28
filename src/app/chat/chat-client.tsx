@@ -47,6 +47,8 @@ type KnowledgeReference = {
   source?: string;
 };
 
+import Image from "next/image"; // 追加
+
 // --- Components ---
 const MichelleAvatar = ({ className, size = "md" }: { className?: string, size?: "sm" | "md" | "lg" }) => {
   const sizeClasses = {
@@ -55,32 +57,22 @@ const MichelleAvatar = ({ className, size = "md" }: { className?: string, size?:
     lg: "h-24 w-24",
   };
 
+  // テストしたい画像ファイル名をここに指定
+  const AVATAR_SRC = "/1.png";
+
   return (
     <div className={cn(
-      "flex items-center justify-center rounded-full bg-gradient-to-br from-pink-100 to-pink-200 border border-pink-200 shadow-sm overflow-hidden",
+      "relative flex items-center justify-center rounded-full border border-pink-200 shadow-sm overflow-hidden bg-pink-50",
       sizeClasses[size],
       className
     )}>
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-full w-full text-pink-400"
-      >
-        {/* 背景の髪 */}
-        <path
-          d="M12 4C15 4 17 6 17 9C17 12 15.5 14 12 14C8.5 14 7 12 7 9C7 6 9 4 12 4Z"
-          fill="currentColor"
-          opacity="0.8"
-        />
-        {/* 首と肩（後ろ姿） */}
-        <path
-          d="M12 13C14.5 13 18 15 18 19V21H6V19C6 15 9.5 13 12 13Z"
-          fill="currentColor"
-        />
-        {/* 髪の結び目（シニヨン風） */}
-        <circle cx="12" cy="7" r="2" fill="currentColor" opacity="0.6" />
-      </svg>
+      <Image
+        src={AVATAR_SRC}
+        alt="Michelle AI"
+        fill
+        className="object-cover"
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      />
     </div>
   );
 };
