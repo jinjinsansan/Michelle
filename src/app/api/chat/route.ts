@@ -73,7 +73,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Failed to create session" }, { status: 500 });
       }
       
-      activeSessionId = newSession.id;
+      // 明示的に型キャストしてエラーを回避
+      const session = newSession as { id: string };
+      activeSessionId = session.id;
     }
 
     // 2. OpenAI Threadの準備
@@ -82,10 +84,9 @@ export async function POST(request: Request) {
       const thread = await openai.beta.threads.create();
       threadId = thread.id;
 
-      // DBに保存
-      await supabase
-        .from("sessions")
-        .update({ openai_thread_id: threadId } as any)
+      // DBに保存（型定義にないカラムのためanyキャストを重ねる）
+      await (supabase.from("sessions") as any)
+        .update({ openai_thread_id: threadId })
         .eq("id", activeSessionId);
     }
 
