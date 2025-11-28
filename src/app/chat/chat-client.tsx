@@ -115,12 +115,15 @@ export default function ChatClient() {
   }, [loadSessions]);
 
   useEffect(() => {
+    // 送信中はリロードしない（ストリーミング中のメッセージが消えるのを防ぐ）
+    if (isLoading.sending) return;
+
     if (activeSessionId) {
       loadMessages(activeSessionId);
     } else {
       setMessages([]);
     }
-  }, [activeSessionId, loadMessages]);
+  }, [activeSessionId, loadMessages, isLoading.sending]);
 
   // 自動スクロール
   useEffect(() => {
