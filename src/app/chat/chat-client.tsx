@@ -450,10 +450,10 @@ export default function ChatClient() {
           {messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center p-8 text-center space-y-6">
               <MichelleAvatar size="lg" />
-              <div className="space-y-2">
+              <div className="space-y-2 px-4">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground">こんにちは、ミシェルです</h2>
-                <p className="text-muted-foreground max-w-md">
-                  心のモヤモヤ、誰にも言えない悩み、なんでも話してください。<br/>
+                <p className="text-muted-foreground max-w-md mx-auto leading-relaxed text-sm md:text-base">
+                  心のモヤモヤ、誰にも言えない悩み、なんでも話してください。
                   私はあなたの鏡となって、一緒に答えを探します。
                 </p>
               </div>
