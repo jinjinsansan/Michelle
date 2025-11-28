@@ -337,3 +337,12 @@ export const RESPONSE_FORMAT_V6 = `
 export const TAPE_SYSTEM_PROMPT = MICHELLE_PROMPT_V6;
 export const RESPONSE_FORMAT_INSTRUCTION = RESPONSE_FORMAT_V6;
 export const SYSTEM_INSTRUCTION = MICHELLE_PROMPT_V6 + "\n\n" + RESPONSE_FORMAT_V6;
+
+
+export type TapeResponse = {
+  emotionMirror: string;
+  deeperQuestion: string;
+  awarenessPrompt: string;
+  nextQuestion: string;
+  affirmation: string;
+};
