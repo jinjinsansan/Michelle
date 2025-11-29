@@ -9,94 +9,46 @@ export default function Home() {
 
   return (
     <>
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="flex min-h-dvh flex-col">
       {/* Hero Section (Video Background) */}
-      <section className="relative isolate flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden bg-[#D1E9FF]">
-        {/* 1. Video Background */}
+      <section className="relative isolate flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden bg-black">
+        {/* Video Background */}
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="absolute inset-0 h-full w-full object-cover opacity-100"
+          className="absolute inset-0 h-full w-full object-cover opacity-60"
         >
           <source src={videoSrc} type="video/mp4" />
         </video>
 
-        {/* 2. Background Overlay Layer (Screen Blend) */}
-        {/* This creates the base blue tint over the video where text isn't present */}
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#D1E9FF] mix-blend-screen">
-          <div className="container flex flex-col items-center gap-12 py-24 text-center">
-             {/* Title Block (VISIBLE) - Determines layout */}
+        {/* Dark Overlay for Better Text Contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/40" />
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center gap-12 py-24 text-center">
+          <div className="container flex flex-col items-center gap-12">
+            {/* Title */}
             <div className="flex flex-col items-center">
-              <h1 className="font-heading text-[clamp(3.5rem,22vw,15rem)] font-bold leading-none tracking-tighter text-black">
+              <h1 className="font-heading text-[clamp(3.5rem,22vw,15rem)] font-bold leading-none tracking-tighter text-blue-400 drop-shadow-2xl">
                 Michelle
               </h1>
-              <p className="mt-16 text-[clamp(1.2rem,4vw,4rem)] font-heading font-medium tracking-widest text-black">
-                ミシェル
-              </p>
-            </div>
-            {/* SPACER */}
-            <div className="flex flex-col items-center gap-8 opacity-0">
-              <p className="text-lg md:text-2xl font-heading font-bold tracking-wide leading-relaxed">
-                特定心理学特化型AI<br />
-                全ての答えは内側に在り
-              </p>
-              <Button size="lg" className="h-16 px-12 text-xl">
-                LINEで始める
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* 3. Cutout Title Layer (Lighten Blend) */}
-        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none bg-[#D1E9FF] mix-blend-lighten">
-          <div className="container flex flex-col items-center gap-12 py-24 text-center">
-             {/* Title Block (VISIBLE) */}
-            <div className="flex flex-col items-center">
-              <h1 className="font-heading text-[clamp(3.5rem,22vw,15rem)] font-bold leading-none tracking-tighter text-black mix-blend-destination-out">
-                Michelle
-              </h1>
-              <p className="mt-16 text-[clamp(1.2rem,4vw,4rem)] font-heading font-medium tracking-widest text-black mix-blend-destination-out">
-                ミシェル
-              </p>
-            </div>
-             {/* SPACER */}
-            <div className="flex flex-col items-center gap-8 opacity-0">
-              <p className="text-lg md:text-2xl font-heading font-medium tracking-wide">
-                特定心理学特化型AI<br />
-                全ての答えは内側に在り
-              </p>
-              <Button size="lg" className="h-16 rounded-full px-12 text-xl">
-                LINEで始める
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* 4. Foreground Content Layer (Normal Blend) */}
-        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center pointer-events-none">
-          <div className="container flex flex-col items-center gap-12 py-24 text-center">
-             {/* SPACER */}
-            <div className="flex flex-col items-center opacity-0">
-              <h1 className="font-heading text-[clamp(3.5rem,22vw,15rem)] font-bold leading-none tracking-tighter">
-                Michelle
-              </h1>
-              <p className="mt-16 text-[clamp(1.2rem,4vw,4rem)] font-heading font-medium tracking-widest">
+              <p className="mt-16 text-[clamp(1.2rem,4vw,4rem)] font-heading font-medium tracking-widest text-blue-300 drop-shadow-lg">
                 ミシェル
               </p>
             </div>
 
-            {/* Visible Description & Button */}
-            <div className="flex flex-col items-center gap-8 pointer-events-auto">
-              <p className="text-lg md:text-2xl text-primary font-heading font-bold tracking-wide drop-shadow-sm leading-relaxed">
+            {/* Description & Button */}
+            <div className="flex flex-col items-center gap-8">
+              <p className="text-lg md:text-2xl text-white font-heading font-bold tracking-wide drop-shadow-lg leading-relaxed">
                 特定心理学特化型AI<br />
                 全ての答えは内側に在り
               </p>
 
               <Button
                 size="lg"
-                className="h-16 rounded-full bg-white px-12 text-xl font-heading font-bold text-primary shadow-xl transition-all hover:scale-105 hover:bg-white/90"
+                className="h-16 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 px-12 text-xl font-heading font-bold text-white shadow-xl shadow-blue-500/30 transition-all hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/40"
                 asChild
               >
                 <Link href="/chat">LINEで始める</Link>
@@ -106,8 +58,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FADE TO BLACK OVERLAY (New) */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-[60] pointer-events-none"></div>
+      {/* FADE TO BLACK OVERLAY */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-[60] pointer-events-none"></div>
     </div>
 
     {/* 
