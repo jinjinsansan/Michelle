@@ -9,9 +9,8 @@ export default function Home() {
 
   return (
     <>
-    <div className="flex min-h-dvh flex-col">
-      {/* Hero Section (Video Background) */}
-      <section className="relative isolate flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden bg-black">
+    {/* Hero Section (Video Background) */}
+    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-black">
         {/* Video Background */}
         <video
           autoPlay
@@ -56,22 +55,29 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+
+      {/* SCROLL INDICATOR */}
+      <div className="absolute bottom-10 left-1/2 z-50 -translate-x-1/2 animate-bounce text-white/80">
+        <span className="text-xs tracking-widest">SCROLL</span>
+        <div className="mx-auto mt-2 h-12 w-[1px] bg-white/50">
+          <div className="h-full w-full bg-gradient-to-b from-transparent to-white"></div>
+        </div>
+      </div>
 
       {/* FADE TO BLACK OVERLAY */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent z-[60] pointer-events-none"></div>
-    </div>
+    </main>
 
     {/* 
       =============================================
       LANDING PAGE CONTENT
       =============================================
     */}
-    <div className="relative z-50 bg-black text-white selection:bg-blue-500 selection:text-white">
+    <div className="relative bg-black text-white selection:bg-blue-500 selection:text-white">
       
       {/* Connecting Section: The Hook */}
-      <section className="relative flex min-h-[50vh] flex-col items-center justify-center overflow-hidden px-4 text-center py-24">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black"></div>
+      <section className="relative flex min-h-[50vh] flex-col items-center justify-center overflow-hidden px-4 text-center py-24 pt-32">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-blue-900/30 via-blue-950/10 to-black"></div>
         
         <div className="space-y-6">
           <p className="text-sm font-bold tracking-[0.5em] text-blue-500 uppercase animate-pulse">WHY MICHELLE?</p>
