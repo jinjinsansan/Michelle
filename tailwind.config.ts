@@ -10,6 +10,13 @@ const config: Config = {
     "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    container: {
+      center: true,
+      padding: "1rem",
+      screens: {
+        "2xl": "1200px",
+      },
+    },
     extend: {
       colors: {
         background: "hsl(var(--background))",
@@ -50,6 +57,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-sans)", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
+        heading: ["var(--font-heading)", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {

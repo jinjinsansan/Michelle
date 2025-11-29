@@ -3,36 +3,40 @@
 @tailwind utilities;
 
 :root {
-  /* ピンク基調のミシェルAIテーマ */
-  --background: 350 50% 99%; /* ほんのりピンク白 */
-  --foreground: 350 10% 20%; /* 優しいチャコールグレー */
+  /* 薄いブルー基調のミシェルAIテーマ */
+  --background: 210 50% 98%; /* 薄いブルー白 */
+  --foreground: 222 47% 11%; /* 深いブルーグレー */
   
   --card: 0 0% 100%;
-  --card-foreground: 350 10% 20%;
+  --card-foreground: 222 47% 11%;
   
   --popover: 0 0% 100%;
-  --popover-foreground: 350 10% 20%;
+  --popover-foreground: 222 47% 11%;
   
-  --primary: 350 80% 75%; /* ミシェルピンク */
-  --primary-foreground: 350 20% 20%; /* 文字色は濃く */
+  --primary: 210 100% 80%; /* 鮮やかながら薄いブルー (ボタン文字用など) */
+  --primary-foreground: 222 47% 11%;
   
-  --secondary: 350 30% 96%;
-  --secondary-foreground: 350 20% 20%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222 47% 11.2%;
   
-  --muted: 350 10% 96%;
-  --muted-foreground: 350 5% 50%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
   
-  --accent: 350 60% 96%;
-  --accent-foreground: 350 20% 20%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222 47% 11.2%;
   
   --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
+  --destructive-foreground: 210 40% 98%;
   
-  --border: 350 20% 92%;
-  --input: 350 20% 92%;
-  --ring: 350 80% 75%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
   
   --radius: 0.75rem;
+
+  /* Togel Font Variable Mappings */
+  --font-sans: var(--font-noto-sans-jp), "Hiragino Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-heading: var(--font-noto-sans-jp), "Inter", "Hiragino Sans", "Helvetica Neue", Arial, sans-serif;
 }
 
 .dark {
@@ -78,6 +82,20 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+
+  /* Togel Navigation Style */
+  body[data-menu-open="true"] {
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+  
+  .mobile-nav-overlay {
+    isolation: isolate;
   }
 
   @keyframes fade-in-up {

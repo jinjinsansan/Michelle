@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Noto_Sans_JP } from "next/font/google";
+import { SiteHeader } from "@/components/layout/site-header";
 import "./globals.css";
 
 const notoSans = Noto_Sans_JP({
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${notoSans.variable} ${jetBrainsMono.variable}`}>
+        <SiteHeader />
         {children}
       </body>
     </html>
