@@ -142,9 +142,9 @@ export default function Home() {
       <section className="relative py-16 md:py-32">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 md:gap-12 md:grid-cols-2 md:items-center">
-            <div className="relative aspect-square w-full max-w-[300px] md:max-w-md mx-auto rounded-3xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-8 flex items-center justify-center shadow-2xl shadow-blue-900/30">
-              <div className="text-7xl md:text-9xl animate-pulse">📚</div>
-              <div className="absolute -top-4 -right-4 bg-blue-600 text-white px-4 py-1 md:px-6 md:py-2 text-lg md:text-xl font-bold rounded-full transform rotate-12 shadow-lg">
+            <div className="relative aspect-square w-full max-w-[300px] md:max-w-md mx-auto rounded-3xl bg-gradient-to-br from-blue-950 to-blue-900 border border-blue-800 p-8 flex items-center justify-center shadow-2xl shadow-blue-500/40">
+              <div className="text-7xl md:text-9xl animate-pulse">🧠</div>
+              <div className="absolute -top-4 -right-4 bg-cyan-500 text-black px-4 py-1 md:px-6 md:py-2 text-lg md:text-xl font-bold rounded-full transform rotate-12 shadow-lg">
                 世界初の実装
               </div>
             </div>
@@ -169,10 +169,10 @@ export default function Home() {
       <section className="relative py-16 md:py-32 bg-gray-950/50">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 md:gap-12 md:grid-cols-2 md:items-center md:flex-row-reverse">
-            <div className="md:order-2 relative aspect-square w-full max-w-[300px] md:max-w-md mx-auto rounded-3xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 p-8 flex flex-col items-center justify-center shadow-2xl text-center">
-              <div className="text-7xl md:text-8xl mb-4">🏁</div>
+            <div className="md:order-2 relative aspect-square w-full max-w-[300px] md:max-w-md mx-auto rounded-3xl bg-gradient-to-br from-cyan-950 to-cyan-900 border border-cyan-800 p-8 flex flex-col items-center justify-center shadow-2xl shadow-cyan-500/40 text-center">
+              <div className="text-7xl md:text-8xl mb-4">🎯</div>
               <div className="text-xl md:text-2xl font-bold text-white">ただ話すだけじゃない</div>
-              <div className="text-cyan-400 font-black text-3xl md:text-4xl">「ゴール」がある</div>
+              <div className="text-cyan-300 font-black text-3xl md:text-4xl">「ゴール」がある</div>
             </div>
             <div className="space-y-4 md:space-y-6 md:order-1 text-center md:text-left flex flex-col items-center md:items-start">
               <div className="inline-block rounded-full bg-gray-900 px-4 py-1 text-sm font-bold text-gray-400 border border-gray-800">
@@ -198,17 +198,17 @@ export default function Home() {
           <div className="grid gap-8 md:gap-12 md:grid-cols-2 md:items-center">
             <div className="relative w-full max-w-[300px] md:max-w-md mx-auto">
               {/* Card Stack Effect */}
-              <div className="absolute top-0 left-0 w-full h-full bg-gray-800 rounded-3xl transform rotate-6 opacity-30"></div>
-              <div className="absolute top-0 left-0 w-full h-full bg-gray-800 rounded-3xl transform -rotate-3 opacity-60"></div>
-              <div className="relative rounded-3xl bg-gradient-to-br from-white to-gray-100 p-6 text-black shadow-2xl transform transition-transform hover:scale-105">
+              <div className="absolute top-0 left-0 w-full h-full bg-blue-800 rounded-3xl transform rotate-6 opacity-30"></div>
+              <div className="absolute top-0 left-0 w-full h-full bg-blue-700 rounded-3xl transform -rotate-3 opacity-40"></div>
+              <div className="relative rounded-3xl bg-gradient-to-br from-blue-950 to-indigo-950 p-6 text-white shadow-2xl shadow-blue-500/30 border border-blue-800 transform transition-transform hover:scale-105">
                 <div className="flex items-center justify-center mb-4">
-                  <div className="text-6xl">🪞</div>
+                  <div className="text-6xl">✨</div>
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold text-center">AIは「鏡」になる</h3>
-                <p className="text-xs md:text-sm text-gray-600 mt-4 leading-loose text-center [text-wrap:balance]">
+                <h3 className="text-xl md:text-2xl font-bold text-center text-blue-100">AIは「鏡」になる</h3>
+                <p className="text-xs md:text-sm text-blue-200/80 mt-4 leading-loose text-center [text-wrap:balance]">
                   あなたの言葉の裏にある<br />
                   「本当の感情」や「思い込み」を映し出す。<br />
-                  <span className="font-bold text-blue-600">答えは全て、あなたの内側にあります。</span>
+                  <span className="font-bold text-cyan-300">答えは全て、あなたの内側にあります。</span>
                 </p>
               </div>
             </div>
