@@ -202,7 +202,7 @@ export default function Home() {
               <div className="absolute top-0 left-0 w-full h-full bg-blue-700 rounded-3xl transform -rotate-3 opacity-40"></div>
               <div className="relative rounded-3xl bg-gradient-to-br from-blue-950 to-indigo-950 p-6 text-white shadow-2xl shadow-blue-500/30 border border-blue-800 transform transition-transform hover:scale-105">
                 <div className="flex items-center justify-center mb-4">
-                  <div className="text-6xl">✨</div>
+                  <div className="text-6xl">💎</div>
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold text-center text-blue-100">AIは「鏡」になる</h3>
                 <p className="text-xs md:text-sm text-blue-200/80 mt-4 leading-loose text-center [text-wrap:balance]">
