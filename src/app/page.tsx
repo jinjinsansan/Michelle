@@ -8,6 +8,7 @@ export default function Home() {
   const videoSrc = "/woman_beach_back_view.mp4";
 
   return (
+    <>
     <div className="flex min-h-dvh flex-col bg-background">
       {/* Hero Section (Video Background) */}
       <section className="relative isolate flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden bg-[#D1E9FF]">
@@ -264,3 +265,6 @@ export default function Home() {
       </section>
 
     </div>
+    </>
+  );
+}
