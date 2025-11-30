@@ -107,8 +107,8 @@ export async function POST(request: Request) {
 
     // 4. RAG検索：関連知識を取得
     const knowledgeMatches = await retrieveKnowledgeMatches(supabase, message, {
-      matchCount: 5,
-      similarityThreshold: 0.5,
+      matchCount: 8,              // 5件→8件に増加（より多くの知識を活用）
+      similarityThreshold: 0.45,  // 0.5→0.45に緩和（より広範囲にヒット）
     });
 
     // 5. Threadにメッセージを追加（RAG知識を含める）
