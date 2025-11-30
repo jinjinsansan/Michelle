@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Brain, Target, Scan, AlertTriangle } from "lucide-react";
 
 export default function Home() {
   // Single video as requested
@@ -101,7 +102,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid gap-8 md:gap-12 md:grid-cols-2 md:items-center">
             <div className="relative aspect-square w-full max-w-[300px] md:max-w-md mx-auto rounded-3xl bg-gradient-to-br from-blue-950 to-blue-900 border border-blue-800 p-8 flex items-center justify-center shadow-2xl shadow-blue-500/40">
-              <div className="text-7xl md:text-9xl animate-pulse">🧠</div>
+              <Brain className="w-32 h-32 md:w-48 md:h-48 text-blue-400 animate-pulse" strokeWidth={1.5} />
               <div className="absolute -top-4 -right-4 bg-cyan-500 text-black px-4 py-1 md:px-6 md:py-2 text-lg md:text-xl font-bold rounded-full transform rotate-12 shadow-lg">
                 世界初の実装
               </div>
@@ -129,7 +130,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="grid gap-8 md:gap-12 md:grid-cols-2 md:items-center md:flex-row-reverse">
             <div className="md:order-2 relative aspect-square w-full max-w-[300px] md:max-w-md mx-auto rounded-3xl bg-gradient-to-br from-cyan-950 to-cyan-900 border border-cyan-800 p-8 flex flex-col items-center justify-center shadow-2xl shadow-cyan-500/40 text-center">
-              <div className="text-7xl md:text-8xl mb-4">🎯</div>
+              <Target className="w-28 h-28 md:w-32 md:h-32 text-cyan-400 mb-4" strokeWidth={1.5} />
               <div className="text-xl md:text-2xl font-bold text-white">ただ話すだけじゃない</div>
               <div className="text-cyan-300 font-black text-3xl md:text-4xl">「ゴール」がある</div>
             </div>
@@ -161,7 +162,7 @@ export default function Home() {
               <div className="absolute top-0 left-0 w-full h-full bg-blue-700 rounded-3xl transform -rotate-3 opacity-40"></div>
               <div className="relative rounded-3xl bg-gradient-to-br from-blue-950 to-indigo-950 p-6 text-white shadow-2xl shadow-blue-500/30 border border-blue-800 transform transition-transform hover:scale-105">
                 <div className="flex items-center justify-center mb-4">
-                  <div className="text-6xl">🧘</div>
+                  <Scan className="w-20 h-20 text-blue-400" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold text-center text-blue-100">AIは「鏡」になる</h3>
                 <p className="text-xs md:text-sm text-blue-200/80 mt-4 leading-loose text-center [text-wrap:balance]">
@@ -209,7 +210,7 @@ export default function Home() {
               それが、本物のカウンセリングです。
             </p>
             <div className="pt-8">
-              <div className="text-6xl md:text-8xl animate-bounce">⚠️</div>
+              <AlertTriangle className="w-20 h-20 md:w-28 md:h-28 text-yellow-500 animate-bounce mx-auto" strokeWidth={1.5} />
             </div>
           </div>
         </div>
