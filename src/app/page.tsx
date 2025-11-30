@@ -41,8 +41,8 @@ export default function Home() {
             {/* Description & Button */}
             <div className="flex flex-col items-center gap-8">
               <p className="text-lg md:text-2xl text-white font-heading font-bold tracking-wide drop-shadow-lg leading-relaxed">
-                特定心理学特化型AI<br />
-                全ての答えは内側に在り
+                ミシェル心理学AI<br />
+                全ての答えはあなたの中に
               </p>
 
               <Button
@@ -90,8 +90,8 @@ export default function Home() {
           <p className="mx-auto max-w-md text-lg text-gray-400 md:text-xl leading-relaxed [text-wrap:balance]">
             一般的なAIは、耳障りの良い言葉を並べるだけ。<br className="hidden md:block" />
             ミシェルは違います。<br className="hidden md:block" />
-            膨大な心理学ナレッジと独自のカウンセリング手法で、<br className="hidden md:block" />
-            あなたの悩みの「根本原因」へ、確実に辿り着きます。
+            ミシェル心理学の膨大なナレッジと独自のカウンセリング手法で、<br className="hidden md:block" />
+            あなたの「心の思い込み」を見つけ出し、根本から解放します。
           </p>
         </div>
       </section>
@@ -115,7 +115,8 @@ export default function Home() {
                 <span className="text-blue-400">専門知識量。</span>
               </h2>
               <p className="text-lg md:text-xl text-gray-400 leading-relaxed [text-wrap:balance]">
-                ミシェルには、特定の心理学領域における<br className="inline md:hidden" />膨大なナレッジ(RAG)が搭載されています。<br className="hidden md:inline" />
+                ミシェルには、ミシェル心理学の<br className="inline md:hidden" />膨大なナレッジ(RAG)が搭載されています。<br className="hidden md:inline" />
+                心の思い込みを見つけ、解放するための<br className="inline md:hidden" />専門知識が詰まっています。<br className="hidden md:inline" />
                 表面的なアドバイスではなく、<br className="inline md:hidden" />心の仕組みに基づいた<br className="inline md:hidden" />「論理的で納得感のある」対話が可能です。
               </p>
             </div>
