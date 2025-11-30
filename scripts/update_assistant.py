@@ -22,10 +22,10 @@ if not API_KEY:
 prompt_file = Path.cwd() / "src" / "lib" / "ai" / "prompt.ts"
 prompt_content = prompt_file.read_text(encoding="utf-8")
 
-# Extract MICHELLE_PROMPT_V8 and RESPONSE_FORMAT_V8
+# Extract MICHELLE_PROMPT_V9 and RESPONSE_FORMAT_V9
 import re
-prompt_match = re.search(r'export const MICHELLE_PROMPT_V8 = `(.*?)`;\s*export const RESPONSE_FORMAT_V8', prompt_content, re.DOTALL)
-format_match = re.search(r'export const RESPONSE_FORMAT_V8 = `(.*?)`;\s*export const TAPE_SYSTEM_PROMPT', prompt_content, re.DOTALL)
+prompt_match = re.search(r'export const MICHELLE_PROMPT_V9 = `(.*?)`;\s*export const RESPONSE_FORMAT_V9', prompt_content, re.DOTALL)
+format_match = re.search(r'export const RESPONSE_FORMAT_V9 = `(.*?)`;\s*export const MICHELLE_SYSTEM_PROMPT', prompt_content, re.DOTALL)
 
 if not prompt_match or not format_match:
     print("❌ Could not extract prompts from prompt.ts")
@@ -44,7 +44,7 @@ headers = {
 
 payload = {
     "instructions": instructions,
-    "name": "Michelle AI (v8.5 - Strict Terminology Control)",
+    "name": "Michelle AI (v9.0 - Michelle Psychology Brand)",
 }
 
 response = requests.post(
