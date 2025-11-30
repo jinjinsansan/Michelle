@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseUserContext } from "@/lib/supabase/context";
 import { getOpenAIClient } from "@/lib/ai/openai";
+import { retrieveKnowledgeMatches } from "@/lib/ai/rag";
 import type { Database } from "@/types/database";
 
 // 環境変数からAssistant IDを取得
@@ -104,10 +105,26 @@ export async function POST(request: Request) {
       console.error("Failed to save user message:", userMessageInsert.error);
     }
 
-    // 4. Threadにメッセージを追加
+    // 4. RAG検索：関連知識を取得
+    const knowledgeMatches = await retrieveKnowledgeMatches(supabase, message, {
+      matchCount: 5,
+      similarityThreshold: 0.5,
+    });
+
+    // 5. Threadにメッセージを追加（RAG知識を含める）
+    let enhancedMessage = message;
+    
+    if (knowledgeMatches.length > 0) {
+      const knowledgeContext = knowledgeMatches
+        .map((match, idx) => `[参考知識${idx + 1}]\n${match.content}`)
+        .join("\n\n");
+      
+      enhancedMessage = `【ユーザーメッセージ】\n${message}\n\n【参考：テープ式心理学ナレッジ】\n以下の知識を参考にして、気づきを促すフェーズで適切に活用してください。\n\n${knowledgeContext}`;
+    }
+
     await openai.beta.threads.messages.create(threadId, {
       role: "user",
-      content: message,
+      content: enhancedMessage,
     });
 
     // 5. Runの実行とストリーミング
