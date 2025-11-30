@@ -119,7 +119,7 @@ export async function POST(request: Request) {
         .map((match, idx) => `[参考知識${idx + 1}]\n${match.content}`)
         .join("\n\n");
       
-      enhancedMessage = `【ユーザーメッセージ】\n${message}\n\n【参考：テープ式心理学ナレッジ】\n以下の知識を参考にして、気づきを促すフェーズで適切に活用してください。\n\n${knowledgeContext}`;
+      enhancedMessage = `【ユーザーメッセージ】\n${message}\n\n---\n内部参考情報（ユーザーには見せないこと）：\n以下のミシェル心理学知識を参考にして、気づきを促すフェーズで適切に活用してください。\n「テープ式心理学」「ガムテープ」などの内部用語は必ず「ミシェル心理学」「心の思い込み」に翻訳して使うこと。\n\n${knowledgeContext}`;
     }
 
     await openai.beta.threads.messages.create(threadId, {

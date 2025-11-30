@@ -319,7 +319,13 @@ export default function ChatClient() {
   };
 
   const cleanContent = (content: string) => {
-    return content.replace(/【\d+:\d+†.*?】/g, "");
+    // OpenAI file_citation の削除（例：【14:2†source】）
+    let cleaned = content.replace(/【\d+:\d+†.*?】/g, "");
+    
+    // RAG参照マーカーの削除（【参考：テープ式心理学ナレッジ】など）
+    cleaned = cleaned.replace(/【参考[：:][^】]*】/g, "");
+    
+    return cleaned;
   };
 
   // ミシェルの思考プロセスメッセージ
