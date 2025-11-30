@@ -322,6 +322,32 @@ export default function ChatClient() {
     return content.replace(/【\d+:\d+†.*?】/g, "");
   };
 
+  // ミシェルの思考プロセスメッセージ
+  const thinkingMessages = [
+    "心の声を聞いています...",
+    "感情を整理しています...",
+    "あなたの言葉を受け止めています...",
+    "思い込みを探しています...",
+    "根源的な感情に着目しています...",
+    "心の仕組みを確認しています...",
+    "ミシェル心理学の知識を参照しています...",
+    "気づきのヒントを探しています...",
+  ];
+
+  const [currentThinkingIndex, setCurrentThinkingIndex] = useState(0);
+
+  // 思考中メッセージのローテーション
+  useEffect(() => {
+    const hasPending = messages.some(m => m.pending);
+    if (!hasPending) return;
+
+    const interval = setInterval(() => {
+      setCurrentThinkingIndex(prev => (prev + 1) % thinkingMessages.length);
+    }, 2000); // 2秒ごとに切り替え
+
+    return () => clearInterval(interval);
+  }, [messages, thinkingMessages.length]);
+
   // --- Render ---
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-background text-foreground">
@@ -494,8 +520,24 @@ export default function ChatClient() {
                       ? "bg-primary text-primary-foreground rounded-tr-sm" 
                       : "bg-white dark:bg-muted border border-border/50 rounded-tl-sm"
                   )}>
-                    <p className="whitespace-pre-wrap">{cleanContent(msg.content)}</p>
-                    {msg.pending && (
+                    {msg.pending && !msg.content ? (
+                      // 思考中の演出（まだコンテンツがない時）
+                      <div className="flex flex-col gap-2 py-2">
+                        <div className="flex items-center gap-2">
+                          <div className="flex gap-1">
+                            <span className="inline-block w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                            <span className="inline-block w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                            <span className="inline-block w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                          </div>
+                          <span className="text-xs text-muted-foreground/70 animate-pulse">
+                            {thinkingMessages[currentThinkingIndex]}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="whitespace-pre-wrap">{cleanContent(msg.content)}</p>
+                    )}
+                    {msg.pending && msg.content && (
                       <span className="inline-block w-1.5 h-4 ml-1 bg-current animate-pulse align-middle" />
                     )}
                   </div>
