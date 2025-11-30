@@ -31,10 +31,10 @@ export default function Home() {
           <div className="container flex flex-col items-center gap-12">
             {/* Title */}
             <div className="flex flex-col items-center">
-              <h1 className="font-heading text-[clamp(3.5rem,22vw,15rem)] font-bold leading-none tracking-tighter text-blue-400 drop-shadow-2xl">
+              <h1 className="font-heading text-[clamp(3.5rem,22vw,15rem)] font-bold leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]">
                 Michelle
               </h1>
-              <p className="mt-16 text-[clamp(1.2rem,4vw,4rem)] font-heading font-medium tracking-widest text-blue-300 drop-shadow-lg">
+              <p className="mt-16 text-[clamp(1.2rem,4vw,4rem)] font-heading font-medium tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-400 drop-shadow-lg">
                 ミシェル
               </p>
             </div>
