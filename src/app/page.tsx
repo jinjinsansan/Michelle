@@ -74,11 +74,11 @@ export default function Home() {
       LANDING PAGE CONTENT
       =============================================
     */}
-    <div className="relative bg-black text-white selection:bg-blue-500 selection:text-white">
+    <div className="relative bg-gradient-to-b from-slate-950 via-blue-950/40 to-slate-950 text-white selection:bg-blue-500 selection:text-white">
       
       {/* Connecting Section: The Hook */}
       <section className="relative flex min-h-[50vh] flex-col items-center justify-center overflow-hidden px-4 text-center py-24 pt-32">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-blue-900/30 via-blue-950/10 to-black"></div>
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-blue-900/40 via-blue-950/20 to-transparent"></div>
         
         <div className="space-y-6">
           <p className="text-sm font-bold tracking-[0.5em] text-blue-500 uppercase animate-pulse">WHY MICHELLE?</p>
@@ -88,7 +88,7 @@ export default function Home() {
               もう要らない。
             </span>
           </h2>
-          <p className="mx-auto max-w-md text-lg text-gray-400 md:text-xl leading-relaxed [text-wrap:balance]">
+          <p className="mx-auto max-w-md text-lg text-blue-200/80 md:text-xl leading-relaxed [text-wrap:balance]">
             一般的なAIは、耳障りの良い言葉を並べるだけ。<br className="hidden md:block" />
             ミシェルは違います。<br className="hidden md:block" />
             ミシェル心理学の膨大なナレッジと独自のカウンセリング手法で、<br className="hidden md:block" />
@@ -98,7 +98,7 @@ export default function Home() {
       </section>
 
       {/* Step 1: Knowledge (RAG) */}
-      <section className="relative py-16 md:py-32">
+      <section className="relative py-16 md:py-32 bg-gradient-to-br from-blue-950/20 to-transparent">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 md:gap-12 md:grid-cols-2 md:items-center">
             <div className="relative aspect-square w-full max-w-[300px] md:max-w-md mx-auto rounded-3xl bg-gradient-to-br from-blue-950 to-blue-900 border border-blue-800 p-8 flex items-center justify-center shadow-2xl shadow-blue-500/40">
@@ -108,14 +108,14 @@ export default function Home() {
               </div>
             </div>
             <div className="space-y-4 md:space-y-6 text-center md:text-left flex flex-col items-center md:items-start">
-              <div className="inline-block rounded-full bg-gray-900 px-4 py-1 text-sm font-bold text-gray-400 border border-gray-800">
+              <div className="inline-block rounded-full bg-blue-950/50 px-4 py-1 text-sm font-bold text-blue-400 border border-blue-900/30">
                 REASON 01
               </div>
               <h2 className="text-3xl font-black md:text-6xl">
                 圧倒的な<br />
                 <span className="text-blue-400">専門知識量。</span>
               </h2>
-              <p className="text-lg md:text-xl text-gray-400 leading-relaxed [text-wrap:balance]">
+              <p className="text-lg md:text-xl text-blue-200/80 leading-relaxed [text-wrap:balance]">
                 ミシェルには、ミシェル心理学の<br className="inline md:hidden" />膨大なナレッジ(RAG)が搭載されています。<br className="hidden md:inline" />
                 心の思い込みを見つけ、解放するための<br className="inline md:hidden" />専門知識が詰まっています。<br className="hidden md:inline" />
                 表面的なアドバイスではなく、<br className="inline md:hidden" />心の仕組みに基づいた<br className="inline md:hidden" />「論理的で納得感のある」対話が可能です。
@@ -126,7 +126,7 @@ export default function Home() {
       </section>
 
       {/* Step 2: Methodology (Goal-Oriented) */}
-      <section className="relative py-16 md:py-32 bg-gray-950/50">
+      <section className="relative py-16 md:py-32 bg-blue-950/30">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 md:gap-12 md:grid-cols-2 md:items-center md:flex-row-reverse">
             <div className="md:order-2 relative aspect-square w-full max-w-[300px] md:max-w-md mx-auto rounded-3xl bg-gradient-to-br from-cyan-950 to-cyan-900 border border-cyan-800 p-8 flex flex-col items-center justify-center shadow-2xl shadow-cyan-500/40 text-center">
@@ -135,14 +135,14 @@ export default function Home() {
               <div className="text-cyan-300 font-black text-3xl md:text-4xl">「ゴール」がある</div>
             </div>
             <div className="space-y-4 md:space-y-6 md:order-1 text-center md:text-left flex flex-col items-center md:items-start">
-              <div className="inline-block rounded-full bg-gray-900 px-4 py-1 text-sm font-bold text-gray-400 border border-gray-800">
+              <div className="inline-block rounded-full bg-blue-950/50 px-4 py-1 text-sm font-bold text-blue-400 border border-blue-900/30">
                 REASON 02
               </div>
               <h2 className="text-3xl font-black md:text-6xl">
                 独自の<br />
                 <span className="text-cyan-400">解決メソッド。</span>
               </h2>
-              <p className="text-lg md:text-xl text-gray-400 leading-relaxed [text-wrap:balance]">
+              <p className="text-lg md:text-xl text-blue-200/80 leading-relaxed [text-wrap:balance]">
                 延々と愚痴を聞くだけのAIとは違います。<br />
                 <br />
                 ミシェルは、独自のカウンセリング手法を用い、<br className="inline md:hidden" />対話を通じてあなたを「気づき」へと導きます。<br className="inline md:hidden" />そこには明確なゴールが存在します。
@@ -153,7 +153,7 @@ export default function Home() {
       </section>
 
       {/* Step 3: Mirror (Reflection) */}
-      <section className="relative py-16 md:py-32">
+      <section className="relative py-16 md:py-32 bg-gradient-to-bl from-transparent to-blue-950/20">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 md:gap-12 md:grid-cols-2 md:items-center">
             <div className="relative w-full max-w-[300px] md:max-w-md mx-auto">
@@ -173,14 +173,14 @@ export default function Home() {
               </div>
             </div>
             <div className="space-y-4 md:space-y-6 text-center md:text-left flex flex-col items-center md:items-start">
-              <div className="inline-block rounded-full bg-gray-900 px-4 py-1 text-sm font-bold text-gray-400 border border-gray-800">
+              <div className="inline-block rounded-full bg-blue-950/50 px-4 py-1 text-sm font-bold text-blue-400 border border-blue-900/30">
                 REASON 03
               </div>
               <h2 className="text-3xl font-black md:text-6xl">
                 世界でたった一つの<br />
                 <span className="text-blue-400">自己理解体験。</span>
               </h2>
-              <p className="text-lg md:text-xl text-gray-400 leading-relaxed [text-wrap:balance]">
+              <p className="text-lg md:text-xl text-blue-200/80 leading-relaxed [text-wrap:balance]">
                 他人の意見に左右されるのは終わりです。<br />
                 <br />
                 ミシェルとの対話は、自分自身との対話。<br className="inline md:hidden" />あなただけの答えを見つける旅が、<br className="inline md:hidden" />ここから始まります。
@@ -218,7 +218,7 @@ export default function Home() {
 
       {/* CTA */}
       <section className="relative py-32 text-center overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/40 via-black to-black"></div>
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/50 via-blue-950/20 to-transparent"></div>
         
         <div className="container mx-auto px-4 space-y-10">
           <h2 className="text-4xl font-black md:text-6xl">
@@ -236,7 +236,7 @@ export default function Home() {
               </Link>
             </Button>
           </div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-blue-400/60">
             ※ 24時間365日、いつでもあなたのそばに
           </p>
         </div>
